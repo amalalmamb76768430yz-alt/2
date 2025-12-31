@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>AI Tools - JOPAI</title>
+<link href="assets/css/ai-tools.css" rel="stylesheet"/>
+<style>
+  :root{
+    --bottom-bg: #0C0B10;
+    --bottom-active: #00d1ff;
+    --text-muted: #7b8593;
+  }
+  /* reserve space so bottom nav doesn't cover content */
+  body{ padding-bottom: 92px; }
+.bottom-nav {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 78px;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding: 8px 0 30px 0;
+      background-color: var(--bottom-bg);
+      box-shadow: 0 -1px 0 rgba(255, 255, 255, 0.04);
+    }
+
+    .bottom-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .bottom-icon-img {
+      width: 26px;
+      height: 26px;
+      object-fit: contain;
+    }
+
+    .bottom-item.power .bottom-icon-img.power-img {
+      width: 40px;
+      height: 40px;
+      border-radius: 999px;
+    }
+
+    .bottom-item.active span {
+      color: var(--bottom-active);
+    }
+
+    @media (min-width: 480px) {
+      .page {
+        max-width: 480px;
+        margin: 0 auto;
+      }
+
+      .bottom-nav {
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
+        max-width: 480px;
+      }
+    }
+  
+    
+</style>
+</head>
+<body>
+<main class="wrap">
+<section class="hero">
+<h1 class="heroTitle"><span class="heroBrand">JOPAI</span> AI Tools</h1>
+<p class="heroLead">Unleash your creativity, explore the future of AI</p>
+<p class="heroText">Everything it does is magical, create, interact, express your creativity, bring AI into your creative world, and experience a whole new level of possibilities.</p>
+<div class="searchRow" role="search">
+<div class="searchBox">
+<input autocomplete="off" data-i18n-placeholder="common.search_tools" id="search" placeholder="Search tool names like: translate, email, summary…" type="search"/>
+<button aria-label="Search" class="searchBtn isPrimary" id="doSearch" title="Search">🔍</button>
+</div>
+</div>
+<div aria-label="Categories" class="chipRow" id="chips"></div>
+<!-- All / Save switch (must always be visible and never disappear) -->
+<div aria-label="Saved filter" class="segDock">
+<div id="segDock"></div>
+</div>
+</section>
+<section aria-live="polite" class="list" id="grid"></section>
+</main>
+<!-- Modal / Sheet -->
+<div class="backdrop" hidden="" id="backdrop"></div>
+<div aria-labelledby="sheetTitle" aria-modal="true" class="sheet" hidden="" id="sheet" role="dialog">
+<div class="sheethead">
+<div>
+<div class="sheettitle" id="sheetTitle"></div>
+<div class="sheetdesc" id="sheetDesc"></div>
+</div>
+<button aria-label="Close" class="iconbtn" id="closeSheet">✕</button>
+</div>
+<div class="sheetbody" id="sheetBody"></div>
+</div>
+<!-- My Works Drawer (hidden for now; will be linked later from My Works / Tool) -->
+<div class="drawer" hidden="" id="drawer">
+<div class="drawerhead">
+<div class="drawertitle">My Works (History)</div>
+<button aria-label="Close" class="iconbtn" id="closeDrawer">✕</button>
+</div>
+<div class="drawerbody">
+<div class="draweractions">
+<button class="btn btn-ghost" id="clearWorks">Clear</button>
+</div>
+<div class="works" id="worksList"></div>
+</div>
+</div>
+<script src="assets/js/ai-tools.js"></script>
+<nav class="bottom-nav">
+<div class="bottom-item tools active">
+<img alt="AI-Tools" class="bottom-icon-img" src="images/tools-icon.png"/>
+<span data-i18n="nav.ai_tools">AI–Tools</span>
+</div>
+<div class="bottom-item chat">
+<img alt="AI Chat" class="bottom-icon-img" src="images/chat-icon.png"/>
+<span data-i18n="nav.ai_chat">AI Chat</span>
+</div>
+<div class="bottom-item power">
+<img alt="AI Power" class="bottom-icon-img power-img" src="images/ai-power.gif"/>
+<span data-i18n="nav.ai_power">AI Power</span>
+</div>
+<div class="bottom-item assets">
+<img alt="Assets" class="bottom-icon-img" src="images/assets-icon.png"/>
+<span data-i18n="nav.assets">Assets</span>
+</div>
+<div class="bottom-item mine">
+<img alt="Mine" class="bottom-icon-img" src="images/mine-icon.png"/>
+<span data-i18n="nav.mine">Mine</span>
+</div>
+</nav>
+<!-- Bottom navigation handler (kept local so the nav always works even if common-nav.js is missing) -->
+<script>
+      (function () {
+        var MAP = {
+          tools: 'ai-tools.html',
+          chat: 'ai-chat.html',
+          power: 'ai-power.html',
+          assets: 'my-assets.html',
+          mine: 'mine.html'
+        };
+
+        function resolveTarget(item) {
+          var t = item.getAttribute('data-target');
+          if (t) return t;
+
+          // infer from class name
+          for (var key in MAP) {
+            if (item.classList.contains(key)) return MAP[key];
+          }
+          return null;
+        }
+
+        function go(target) {
+          if (!target) return;
+          window.location.href = target;
+        }
+
+        function bindBottomNav() {
+          var nav = document.querySelector('.bottom-nav');
+          if (!nav) return;
+
+          nav.style.zIndex = '9999';
+          nav.style.pointerEvents = 'auto';
+
+          var items = nav.querySelectorAll('.bottom-item');
+          items.forEach(function (item) {
+            item.style.cursor = 'pointer';
+            item.style.pointerEvents = 'auto';
+
+            var handler = function (e) {
+              // don't break normal scroll, but keep tap reliable
+              e.preventDefault();
+              e.stopPropagation();
+
+              // active state
+              items.forEach(function (x) { x.classList.remove('active'); });
+              item.classList.add('active');
+
+              go(resolveTarget(item));
+            };
+
+            item.addEventListener('click', handler);
+            item.addEventListener('touchend', handler, { passive: false });
+          });
+        }
+
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', bindBottomNav);
+        } else {
+          bindBottomNav();
+        }
+      })();
+    </script>
+<script defer src="i18n-site.js"></script></body>
+</html>

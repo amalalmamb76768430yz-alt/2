@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport"/>
+<title data-i18n="account.status_limits">Account Status &amp; Limits</title>
+<style>
+    :root{color-scheme:dark}
+    body{margin:0;background:#070a0f;color:#fff;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+    .topbar{position:sticky;top:0;display:flex;align-items:center;gap:10px;padding:14px 14px;background:rgba(7,10,15,.92);backdrop-filter:blur(10px)}
+    .back-btn{width:40px;height:40px;border:0;border-radius:12px;background:rgba(255,255,255,.06);display:grid;place-items:center;cursor:pointer}
+    .title{font-weight:600;letter-spacing:.2px}
+    .wrap{padding:14px;display:grid;gap:12px}
+    .card{background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:14px}
+    .row{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid rgba(255,255,255,.08)}
+    .row:first-child{border-top:0;padding-top:0}
+    .k{color:rgba(255,255,255,.72);font-size:13px}
+    .v{font-weight:600}
+    .note{color:rgba(255,255,255,.72);font-size:13px;line-height:1.5;margin-top:10px}
+    .pill{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.10);font-size:12px}
+    ul{margin:10px 0 0 18px;color:rgba(255,255,255,.80);line-height:1.55}
+    li{margin:6px 0}
+  </style>
+</head>
+<body>
+<header class="topbar">
+<button aria-label="Back" class="back-btn" id="backBtn" type="button">
+<svg aria-hidden="true" fill="none" height="18" viewbox="0 0 24 24" width="18">
+<path d="M15 18l-6-6 6-6" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-opacity=".9" stroke-width="2.2"></path>
+</svg>
+</button>
+<div class="title" data-i18n="account.status_limits">Account Status &amp; Limits</div>
+</header>
+<main class="wrap">
+<div class="card">
+<div class="pill">Account Status (General)</div>
+<div class="row"><div class="k">Active</div><div class="v">Normal access</div></div>
+<div class="row"><div class="k">Locked</div><div class="v">Temporarily restricted</div></div>
+<div class="row"><div class="k">Restricted</div><div class="v">Limited features</div></div>
+<div class="note">
+        Possible reasons for restrictions:
+        <ul>
+<li>Security review or unusual activity detection</li>
+<li>Incomplete required steps (activation or funding rules)</li>
+<li>Risk control checks for withdrawals</li>
+<li>Violation of platform rules</li>
+</ul>
+</div>
+</div>
+<div class="card">
+<div style="font-weight:600;margin-bottom:8px">Limits (General)</div>
+<div class="row"><div class="k">Daily action</div><div class="v">1 action / 24h</div></div>
+<div class="row"><div class="k">Referral depth</div><div class="v">Up to 3 levels</div></div>
+<div class="row"><div class="k">Withdraw status</div><div class="v">Review → Approved → Paid</div></div>
+<div class="note">
+        These are general descriptions for users. Actual limits and eligibility may depend on your current rules and security checks.
+      </div>
+</div>
+</main>
+<script>
+    (function(){
+      const backBtn=document.getElementById('backBtn');
+      if(backBtn){backBtn.addEventListener('click',()=>{ if(history.length>1) history.back(); });}
+    })();
+  </script>
+<script defer src="i18n-site.js"></script></body>
+</html>

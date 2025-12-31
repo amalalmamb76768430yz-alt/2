@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title data-i18n="common.tool">Tool</title>
+<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport"/>
+<style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      background-color: #05070b;
+      color: #ffffff;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+    }
+
+    .page {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .header {
+      height: 44px;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      flex-shrink: 0;
+    }
+
+    .header-left {
+      width: 40px;
+      display: flex;
+      align-items: center;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+    }
+
+    .back-icon {
+      width: 10px;
+      height: 10px;
+      border-left: 2px solid #ffffff;
+      border-bottom: 2px solid #ffffff;
+      transform: rotate(45deg);
+    }
+
+    .header-title {
+      flex: 1;
+      text-align: center;
+      font-size: 16px;
+      font-weight: 500;
+    }
+
+    .header-right {
+      width: 40px;
+    }
+
+    .main {
+      flex: 1;
+      padding: 12px 12px 24px;
+      overflow-y: auto;
+    }
+
+    .search-section {
+      margin-bottom: 12px;
+    }
+
+    .search-box {
+      border-radius: 8px;
+      border: 1px solid #00d1ff;
+      padding: 6px;
+      display: flex;
+      align-items: center;
+      background-color: #05070b;
+    }
+
+    .search-input {
+      flex: 1;
+      height: 32px;
+      border: none;
+      outline: none;
+      padding: 0 8px;
+      background: transparent;
+      color: #ffffff;
+      font-size: 13px;
+    }
+
+    .search-input::placeholder {
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .search-btn {
+      height: 32px;
+      padding: 0 14px;
+      border-radius: 6px;
+      border: none;
+      outline: none;
+      background-color: #00d1ff;
+      color: #05070b;
+      font-size: 13px;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      white-space: nowrap;
+    }
+
+    .search-btn span {
+      margin-left: 4px;
+    }
+
+    .open-tool-title {
+      margin-top: 14px;
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    .open-tool-hint {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.6);
+      margin-bottom: 10px;
+    }
+
+    .tool-list {
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      background-color: #05070b;
+    }
+
+    .tool-row {
+      display: flex;
+      align-items: center;
+      padding: 10px 12px;
+      background-color: #101b20;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .tool-row:last-child {
+      border-bottom: none;
+    }
+
+    .tool-icon-wrap {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: radial-gradient(circle at 30% 30%, #ff7b55, #c5281f);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 10px;
+      flex-shrink: 0;
+    }
+
+    .tool-icon-inner {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+      border: 1px solid rgba(0, 0, 0, 0.4);
+      background: rgba(0, 0, 0, 0.25);
+    }
+
+    .tool-name {
+      flex: 1;
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .toggle {
+      width: 38px;
+      height: 20px;
+      border-radius: 999px;
+      background-color: #2a2a2a;
+      position: relative;
+      flex-shrink: 0;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .toggle-knob {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background-color: #ffffff;
+      transition: transform 0.2s ease;
+    }
+
+    .toggle.on {
+      background-color: #00d1ff;
+    }
+
+    .toggle.on .toggle-knob {
+      transform: translateX(18px);
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+<div class="header">
+<div class="header-left">
+<a aria-label="Back" class="back-btn" href="javascript:history.back();">
+<span class="back-icon"></span>
+</a>
+</div>
+<div class="header-title" data-i18n="common.tool">Tool</div>
+<div class="header-right"></div>
+</div>
+<div class="main">
+<div class="search-section">
+<div class="search-box">
+<input class="search-input" placeholder="Enter ID or name search tool" type="text"/>
+<button class="search-btn">
+            🔍<span>Search</span>
+</button>
+</div>
+</div>
+<div class="open-tool-title">Open Tool</div>
+<div class="open-tool-hint">
+        *Enabled AI tools will be displayed in the home recommendation section
+      </div>
+<div class="tool-list">
+<div class="tool-row" data-tool="pronounce">
+<div aria-hidden="true" class="tool-icon-wrap">
+<div class="tool-icon-inner" style="display:flex;align-items:center;justify-content:center;font-size:12px;">🗣️</div>
+</div>
+<div class="tool-name">English Pronunciation Helper</div>
+<div aria-checked="true" class="toggle on" data-tool="pronounce" role="switch">
+<div class="toggle-knob"></div>
+</div>
+</div>
+<div class="tool-row" data-tool="lang_detect">
+<div aria-hidden="true" class="tool-icon-wrap">
+<div class="tool-icon-inner" style="display:flex;align-items:center;justify-content:center;font-size:12px;">📩</div>
+</div>
+<div class="tool-name">Language Detector</div>
+<div aria-checked="true" class="toggle on" data-tool="lang_detect" role="switch">
+<div class="toggle-knob"></div>
+</div>
+</div>
+<div class="tool-row" data-tool="clean_text">
+<div aria-hidden="true" class="tool-icon-wrap">
+<div class="tool-icon-inner" style="display:flex;align-items:center;justify-content:center;font-size:12px;">🧹</div>
+</div>
+<div class="tool-name">Text Cleaner</div>
+<div aria-checked="true" class="toggle on" data-tool="clean_text" role="switch">
+<div class="toggle-knob"></div>
+</div>
+</div>
+<div class="tool-row" data-tool="email_assistant">
+<div aria-hidden="true" class="tool-icon-wrap">
+<div class="tool-icon-inner" style="display:flex;align-items:center;justify-content:center;font-size:12px;">🎓</div>
+</div>
+<div class="tool-name">Email Assistant</div>
+<div aria-checked="true" class="toggle on" data-tool="email_assistant" role="switch">
+<div class="toggle-knob"></div>
+</div>
+</div>
+<div class="tool-row" data-tool="contract_template">
+<div aria-hidden="true" class="tool-icon-wrap">
+<div class="tool-icon-inner" style="display:flex;align-items:center;justify-content:center;font-size:12px;">🔥</div>
+</div>
+<div class="tool-name">Contract/Agreement/Tender Template</div>
+<div aria-checked="true" class="toggle on" data-tool="contract_template" role="switch">
+<div class="toggle-knob"></div>
+</div>
+</div>
+<div class="tool-row" data-tool="work_summary_2023">
+<div aria-hidden="true" class="tool-icon-wrap">
+<div class="tool-icon-inner" style="display:flex;align-items:center;justify-content:center;font-size:12px;">🧾</div>
+</div>
+<div class="tool-name">Work Summary Generator</div>
+<div aria-checked="true" class="toggle on" data-tool="work_summary_2023" role="switch">
+<div class="toggle-knob"></div>
+</div>
+</div>
+<div class="tool-row" data-tool="user_portrait">
+<div aria-hidden="true" class="tool-icon-wrap">
+<div class="tool-icon-inner" style="display:flex;align-items:center;justify-content:center;font-size:12px;">🔗</div>
+</div>
+<div class="tool-name">User Portrait (Persona) Builder</div>
+<div aria-checked="true" class="toggle on" data-tool="user_portrait" role="switch">
+<div class="toggle-knob"></div>
+</div>
+</div>
+<div class="tool-row" data-tool="ux_ui_brief">
+<div aria-hidden="true" class="tool-icon-wrap">
+<div class="tool-icon-inner" style="display:flex;align-items:center;justify-content:center;font-size:12px;">🧊</div>
+</div>
+<div class="tool-name">UX/UI Designer Brief</div>
+<div aria-checked="true" class="toggle on" data-tool="ux_ui_brief" role="switch">
+<div class="toggle-knob"></div>
+</div>
+</div>
+<div class="tool-row" data-tool="habit_plan">
+<div aria-hidden="true" class="tool-icon-wrap">
+<div class="tool-icon-inner" style="display:flex;align-items:center;justify-content:center;font-size:12px;">📈</div>
+</div>
+<div class="tool-name">Personal Trainer (Plan Builder)</div>
+<div aria-checked="true" class="toggle on" data-tool="habit_plan" role="switch">
+<div class="toggle-knob"></div>
+</div>
+</div>
+<div class="tool-row" data-tool="emergency_checklist">
+<div aria-hidden="true" class="tool-icon-wrap">
+<div class="tool-icon-inner" style="display:flex;align-items:center;justify-content:center;font-size:12px;">🚨</div>
+</div>
+<div class="tool-name">Emergency Response Checklist</div>
+<div aria-checked="true" class="toggle on" data-tool="emergency_checklist" role="switch">
+<div class="toggle-knob"></div>
+</div>
+</div>
+<div class="tool-row" data-tool="trip_itinerary">
+<div aria-hidden="true" class="tool-icon-wrap">
+<div class="tool-icon-inner" style="display:flex;align-items:center;justify-content:center;font-size:12px;">✨</div>
+</div>
+<div class="tool-name">Travel Recommendation Planner</div>
+<div aria-checked="true" class="toggle on" data-tool="trip_itinerary" role="switch">
+<div class="toggle-knob"></div>
+</div>
+</div>
+<div class="tool-row" data-tool="packing_list">
+<div aria-hidden="true" class="tool-icon-wrap">
+<div class="tool-icon-inner" style="display:flex;align-items:center;justify-content:center;font-size:12px;">🧭</div>
+</div>
+<div class="tool-name">Smart Packing List</div>
+<div aria-checked="true" class="toggle on" data-tool="packing_list" role="switch">
+<div class="toggle-knob"></div>
+</div>
+</div>
+<div class="tool-row" data-tool="ielts_helper">
+<div aria-hidden="true" class="tool-icon-wrap">
+<div class="tool-icon-inner" style="display:flex;align-items:center;justify-content:center;font-size:12px;">📝</div>
+</div>
+<div class="tool-name">IELTS Essay Writing Helper</div>
+<div aria-checked="true" class="toggle on" data-tool="ielts_helper" role="switch">
+<div class="toggle-knob"></div>
+</div>
+</div>
+<div class="tool-row" data-tool="lesson_plan">
+<div aria-hidden="true" class="tool-icon-wrap">
+<div class="tool-icon-inner" style="display:flex;align-items:center;justify-content:center;font-size:12px;">➗</div>
+</div>
+<div class="tool-name">Write Lesson Plans</div>
+<div aria-checked="true" class="toggle on" data-tool="lesson_plan" role="switch">
+<div class="toggle-knob"></div>
+</div>
+</div>
+<div class="tool-row" data-tool="prompt_builder">
+<div aria-hidden="true" class="tool-icon-wrap">
+<div class="tool-icon-inner" style="display:flex;align-items:center;justify-content:center;font-size:12px;">💬</div>
+</div>
+<div class="tool-name">Chat Prompt Builder</div>
+<div aria-checked="true" class="toggle on" data-tool="prompt_builder" role="switch">
+<div class="toggle-knob"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const STORAGE_ENABLED = "jopai_ai_tools_enabled_v1";
+  const toggles = Array.from(document.querySelectorAll(".toggle[data-tool]"));
+  const rows = Array.from(document.querySelectorAll(".tool-row[data-tool]"));
+
+  function readEnabledSet() {
+    try {
+      const raw = localStorage.getItem(STORAGE_ENABLED);
+      if (!raw) return new Set(toggles.map(t=>t.dataset.tool)); // default all on
+      const arr = JSON.parse(raw);
+      if (!Array.isArray(arr)) return new Set(toggles.map(t=>t.dataset.tool));
+      return new Set(arr);
+    } catch(e) {
+      return new Set(toggles.map(t=>t.dataset.tool));
+    }
+  }
+
+  function writeEnabledSet(set) {
+    localStorage.setItem(STORAGE_ENABLED, JSON.stringify(Array.from(set)));
+  }
+
+  // init UI from storage
+  let enabled = readEnabledSet();
+  toggles.forEach(t => {
+    const id = t.dataset.tool;
+    const on = enabled.has(id);
+    t.classList.toggle("on", on);
+    t.setAttribute("aria-checked", on ? "true" : "false");
+  });
+
+  toggles.forEach(t => {
+    t.addEventListener("click", () => {
+      const id = t.dataset.tool;
+      const willOn = !t.classList.contains("on");
+      t.classList.toggle("on", willOn);
+      t.setAttribute("aria-checked", willOn ? "true" : "false");
+      enabled = readEnabledSet(); // in case another tab changed
+      if (willOn) enabled.add(id); else enabled.delete(id);
+      writeEnabledSet(enabled);
+    });
+  });
+
+  // Search filter (front-end only)
+  const input = document.querySelector(".search-input");
+  const btn = document.querySelector(".search-btn");
+  function applySearch() {
+    const q = (input?.value || "").trim().toLowerCase();
+    rows.forEach(r => {
+      const name = (r.querySelector(".tool-name")?.textContent || "").toLowerCase();
+      const id = r.dataset.tool || "";
+      const show = !q || name.includes(q) || id.includes(q);
+      r.style.display = show ? "flex" : "none";
+    });
+  }
+  input?.addEventListener("input", applySearch);
+  btn?.addEventListener("click", (e) => { e.preventDefault(); applySearch(); });
+});
+</script>
+<script src="common-nav.js"></script>
+<script defer src="i18n-site.js"></script></body>
+</html>

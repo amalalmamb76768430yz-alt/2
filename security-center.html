@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title data-i18n="security.center">Security Center</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<style>
+    :root {
+      --page-bg: #0C0B10;
+      --card-bg: #17202D;
+      --card-inner-bg: #050812;
+      --text-primary: #ffffff;
+      --text-secondary: rgba(255, 255, 255, 0.45);
+      --border-subtle: #233246;
+      --input-bg: #050812;
+      --input-border: #233246;
+      --btn-bg: linear-gradient(90deg, #0B2F3B 0%, #101B20 100%);
+      --btn-disabled-bg: rgba(255, 255, 255, 0.06);
+      --accent: #00d1ff;
+      --danger: #ff5c5c;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--page-bg);
+      color: var(--text-primary);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+    }
+
+    .app {
+      min-height: 100vh;
+      max-width: 480px;
+      margin: 0 auto;
+      background-color: var(--page-bg);
+    }
+
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      background: #000000;
+    }
+
+    .back-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      margin-right: 8px;
+      background: rgba(11, 12, 16, 0.95);
+    }
+
+    .back-arrow {
+      width: 10px;
+      height: 10px;
+      border-left: 2px solid #ffffff;
+      border-bottom: 2px solid #ffffff;
+      transform: rotate(45deg);
+    }
+
+    .app-header-title {
+      flex: 1;
+      text-align: center;
+      margin-right: 40px;
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .app-main {
+      padding: 16px 12px 24px;
+    }
+
+    .security-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .security-item {
+      background-color: var(--card-bg);
+      border-radius: 14px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .security-item.is-disabled {
+      opacity: 0.5;
+    }
+
+    .security-item.is-clickable {
+      cursor: pointer;
+    }
+
+    .item-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .icon-box {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background-color: var(--card-inner-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .icon-box img {
+      width: 18px;
+      height: 18px;
+      display: block;
+      object-fit: contain;
+    }
+
+    .label-text {
+      font-size: 14px;
+    }
+
+    .item-right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .chevron {
+      width: 7px;
+      height: 7px;
+      border-right: 1px solid var(--text-secondary);
+      border-bottom: 1px solid var(--text-secondary);
+      transform: rotate(-45deg);
+      margin-top: 1px;
+    }
+
+    /* Modal base */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.72);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 0 18px;
+    }
+
+    .modal-backdrop.is-visible {
+      display: flex;
+    }
+
+    .modal {
+      width: 100%;
+      max-width: 420px;
+      background-color: #070a12;
+      border-radius: 16px;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 18px 60px rgba(0,0,0,0.85);
+      padding: 14px 16px 16px;
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .modal-title {
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .modal-close {
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      cursor: pointer;
+      color: var(--text-secondary);
+      background-color: transparent;
+    }
+
+    .modal-body {
+      margin-top: 4px;
+    }
+
+    .field-group {
+      margin-bottom: 10px;
+    }
+
+    .field-label-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 4px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .field-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .field-extra {
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+
+    .field-input-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .field-input {
+      flex: 1;
+      height: 36px;
+      border-radius: 8px;
+      border: 1px solid var(--input-border);
+      background-color: var(--input-bg);
+      padding: 0 10px;
+      font-size: 13px;
+      color: var(--text-primary);
+      outline: none;
+    }
+
+    .field-input[disabled] {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .field-input::placeholder {
+      color: rgba(255,255,255,0.28);
+    }
+
+    .send-btn {
+      flex-shrink: 0;
+      padding: 0 10px;
+      height: 32px;
+      border-radius: 999px;
+      border: 1px solid var(--input-border);
+      background-color: rgba(255,255,255,0.04);
+      color: var(--text-primary);
+      font-size: 12px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .send-btn[disabled] {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .error-text {
+      margin-top: 4px;
+      font-size: 11px;
+      color: var(--danger);
+      min-height: 14px;
+    }
+
+    .modal-footer {
+      margin-top: 8px;
+    }
+
+    .primary-btn {
+      width: 100%;
+      height: 38px;
+      border-radius: 999px;
+      border: none;
+      font-size: 14px;
+      color: #ffffff;
+      background-image: var(--btn-bg);
+      cursor: pointer;
+    }
+
+    .primary-btn[disabled] {
+      background-image: none;
+      background-color: var(--btn-disabled-bg);
+      color: rgba(255,255,255,0.4);
+      cursor: not-allowed;
+    }
+
+    .hint-text {
+      font-size: 11px;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+    }
+
+    .toast-message {
+      position: fixed;
+      left: 50%;
+      top: 110px;
+      transform: translate(-50%, -10px);
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.82);
+      color: #ffffff;
+      font-size: 12px;
+      line-height: 1.4;
+      max-width: 80%;
+      text-align: center;
+      z-index: 200;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.18s ease-out, transform 0.18s ease-out;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+
+    .toast-message.toast-visible {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
+    @media (min-width: 481px) {
+      body {
+        display: flex;
+        justify-content: center;
+        background-color: #000;
+      }
+      .app {
+        margin-top: 12px;
+        border-radius: 20px;
+        border: 1px solid #171924;
+        overflow: hidden;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+<header class="app-header">
+<a class="back-btn" href="javascript:history.back()">
+<div class="back-arrow"></div>
+</a>
+<div class="app-header-title" data-i18n="security.center">Security Center</div>
+</header>
+<main class="app-main">
+<section class="security-list">
+<div class="security-item is-disabled">
+<div class="item-left">
+<div class="icon-box">
+<img alt="Phone" src="images/Phone.png"/>
+</div>
+<div class="label-text">Phone</div>
+</div>
+<div class="item-right">
+<span data-i18n="common.set">Set</span>
+<div class="chevron"></div>
+</div>
+</div>
+<div class="security-item is-clickable" data-security="fund-password">
+<div class="item-left">
+<div class="icon-box">
+<img alt="Fund Password" src="images/Fund Password.png"/>
+</div>
+<div class="label-text">Fund Password</div>
+</div>
+<div class="item-right">
+<span data-i18n="common.set">Set</span>
+<div class="chevron"></div>
+</div>
+</div>
+<div class="security-item is-clickable" data-security="login-password">
+<div class="item-left">
+<div class="icon-box">
+<img alt="Login Password" src="images/Login Password.png"/>
+</div>
+<div class="label-text">Login Password</div>
+</div>
+<div class="item-right">
+<span data-i18n="common.set">Set</span>
+<div class="chevron"></div>
+</div>
+</div>
+<div class="security-item is-clickable" data-security="email">
+<div class="item-left">
+<div class="icon-box">
+<img alt="Email" src="images/Email.png"/>
+</div>
+<div class="label-text">Email</div>
+</div>
+<div class="item-right">
+<span data-i18n="common.set">Set</span>
+<div class="chevron"></div>
+</div>
+</div>
+</section>
+</main>
+</div>
+<div class="toast-message" id="toast"></div>
+<!-- Login password modal -->
+<div class="modal-backdrop" id="modal-login-password">
+<div class="modal">
+<div class="modal-header">
+<div class="modal-title">Set Login Password</div>
+<button class="modal-close" data-close="login-password" type="button">×</button>
+</div>
+<div class="modal-body">
+<div class="hint-text">New password must be at least 8 characters.</div>
+<div class="field-group">
+<div class="field-label-row">
+<span class="field-label">New password</span>
+</div>
+<input autocomplete="new-password" class="field-input" data-i18n-placeholder="auth.enter_new_password" id="lp-new" maxlength="32" placeholder="Enter new password" type="password"/>
+<div class="error-text" id="lp-new-error"></div>
+</div>
+<div class="field-group">
+<div class="field-label-row">
+<span class="field-label">Confirm new password</span>
+</div>
+<input autocomplete="new-password" class="field-input" data-i18n-placeholder="auth.confirm_new_password" disabled="" id="lp-confirm" maxlength="32" placeholder="Confirm new password" type="password"/>
+<div class="error-text" id="lp-confirm-error"></div>
+</div>
+<div class="field-group">
+<div class="field-label-row">
+<span class="field-label">Current login password</span>
+</div>
+<input autocomplete="current-password" class="field-input" data-i18n-placeholder="auth.enter_current_password" id="lp-current" maxlength="32" placeholder="Enter current login password" type="password"/>
+<div class="error-text" id="lp-current-error"></div>
+</div>
+</div>
+<div class="modal-footer">
+<button class="primary-btn" disabled="" id="lp-submit" type="button">Confirm</button>
+</div>
+</div>
+</div>
+<!-- Fund password modal -->
+<div class="modal-backdrop" id="modal-fund-password">
+<div class="modal">
+<div class="modal-header">
+<div class="modal-title">Set Fund Password</div>
+<button class="modal-close" data-close="fund-password" type="button">×</button>
+</div>
+<div class="modal-body">
+<div class="hint-text">Fund password must be exactly 6 digits.</div>
+<div class="field-group">
+<div class="field-label-row">
+<span class="field-label">Fund password</span>
+</div>
+<input class="field-input" data-i18n-placeholder="auth.enter_6_digit_password" id="fp-new" inputmode="numeric" maxlength="6" pattern="\d*" placeholder="Enter 6-digit password" type="password"/>
+<div class="error-text" id="fp-new-error"></div>
+</div>
+<div class="field-group">
+<div class="field-label-row">
+<span class="field-label">Confirm fund password</span>
+</div>
+<input class="field-input" data-i18n-placeholder="auth.confirm_6_digit_password" disabled="" id="fp-confirm" inputmode="numeric" maxlength="6" pattern="\d*" placeholder="Confirm 6-digit password" type="password"/>
+<div class="error-text" id="fp-confirm-error"></div>
+</div>
+<div class="field-group">
+<div class="field-label-row">
+<span class="field-label">Login password</span>
+</div>
+<input class="field-input" id="fp-login" maxlength="32" placeholder="Enter login password" type="password"/>
+<div class="error-text" id="fp-login-error"></div>
+</div>
+</div>
+<div class="modal-footer">
+<button class="primary-btn" disabled="" id="fp-submit" type="button">Confirm</button>
+</div>
+</div>
+</div>
+<!-- Email modal -->
+<div class="modal-backdrop" id="modal-email">
+<div class="modal">
+<div class="modal-header">
+<div class="modal-title" id="email-modal-title">Set Email</div>
+<button class="modal-close" data-close="email" type="button">×</button>
+</div>
+<div class="modal-body">
+<!-- New email state -->
+<div id="email-state-new">
+<div class="field-group">
+<div class="field-label-row">
+<span class="field-label">Email</span>
+</div>
+<div class="field-input-row">
+<input class="field-input" id="em-email" placeholder="Enter email" type="email"/>
+<button class="send-btn" id="em-send" type="button">Send</button>
+</div>
+<div class="error-text" id="em-email-error"></div>
+</div>
+<div class="field-group">
+<div class="field-label-row">
+<span class="field-label">Verification code</span>
+</div>
+<input class="field-input" id="em-code" maxlength="6" placeholder="Enter code" type="text"/>
+<div class="error-text" id="em-code-error"></div>
+</div>
+<div class="field-group">
+<div class="field-label-row">
+<span class="field-label">Login password</span>
+</div>
+<input class="field-input" id="em-password" maxlength="32" placeholder="Enter login password" type="password"/>
+<div class="error-text" id="em-password-error"></div>
+</div>
+</div>
+<!-- Change email state -->
+<div id="email-state-change" style="display:none;">
+<div class="field-group">
+<div class="field-label-row">
+<span class="field-label">Current email</span>
+</div>
+<div class="field-input-row">
+<input class="field-input" id="em-old-email" readonly="" type="email"/>
+<button class="send-btn" id="em-old-send" type="button">Send</button>
+</div>
+<div class="error-text" id="em-old-email-error"></div>
+</div>
+<div class="field-group">
+<div class="field-label-row">
+<span class="field-label">Code to current email</span>
+</div>
+<input class="field-input" id="em-old-code" maxlength="6" placeholder="Enter code" type="text"/>
+<div class="error-text" id="em-old-code-error"></div>
+</div>
+<div class="field-group">
+<div class="field-label-row">
+<span class="field-label">New email</span>
+</div>
+<div class="field-input-row">
+<input class="field-input" id="em-new-email" placeholder="Enter new email" type="email"/>
+<button class="send-btn" id="em-new-send" type="button">Send</button>
+</div>
+<div class="error-text" id="em-new-email-error"></div>
+</div>
+<div class="field-group">
+<div class="field-label-row">
+<span class="field-label">Code to new email</span>
+</div>
+<input class="field-input" id="em-new-code" maxlength="6" placeholder="Enter code" type="text"/>
+<div class="error-text" id="em-new-code-error"></div>
+</div>
+<div class="field-group">
+<div class="field-label-row">
+<span class="field-label">Login password</span>
+</div>
+<input class="field-input" id="em-change-password" maxlength="32" placeholder="Enter login password" type="password"/>
+<div class="error-text" id="em-change-password-error"></div>
+</div>
+</div>
+</div>
+<div class="modal-footer">
+<button class="primary-btn" disabled="" id="em-submit" type="button">Confirm</button>
+</div>
+</div>
+</div>
+<script src="sb-config.js"></script>
+<script src="auth.js"></script>
+<script src="sb-user.js"></script>
+<script src="security-center.js"></script>
+<script defer src="i18n-site.js"></script></body>
+</html>

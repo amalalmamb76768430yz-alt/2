@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport"/>
+<title data-i18n="nav.ai_chat">AI Chat</title>
+<style>
+    :root {
+      --page-bg: #05070b;
+      --card-main: #0B2F3B;
+      --text-main: #ffffff;
+      --text-muted: #7b8593;
+      --accent: #00e4c0;
+      --border-soft: #283341;
+      --bottom-active: #00d1ff;
+      --bottom-bg: #0C0B10;
+      --item-bg: #12151d;
+
+      /* Run button gradient (Jopai) */
+      --run-blue:#18C1FF;
+      --run-green:#22E1A5;
+      --run-grad: linear-gradient(90deg, var(--run-blue), var(--run-green));
+    }
+
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+
+    body{
+      margin:0;
+      font-family:-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+      background-color: var(--page-bg);
+      color: var(--text-main);
+    }
+
+    .page{
+      min-height:100vh;
+      background-color: var(--page-bg);
+      display:flex;
+      flex-direction:column;
+    }
+
+    .nav-bar{
+      height:46px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:16px;
+      font-weight:600;
+      color:#ffffffd9;
+    }
+
+    /* IMPORTANT: نفس padding تبع الصفحات القديمة حتى الهيدر السفلي يضل ثابت */
+    .content{
+      flex:1;
+      overflow-y:auto;
+      padding: 8px 12px 80px 12px;
+    }
+
+    /* Chat UI */
+    .chat{
+      direction: rtl; /* العربية داخل المحتوى فقط */
+    }
+    .chat-log{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      padding-top:8px;
+      min-height:60vh;
+    }
+    .bubble{
+      max-width:88%;
+      padding:10px 12px;
+      border-radius:14px;
+      line-height:1.35;
+      white-space:pre-wrap;
+      border:1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.06);
+    }
+    .bubble.me{
+      align-self:flex-start;
+      border:1px solid rgba(24,193,255,0.22);
+      background: rgba(24,193,255,0.12);
+    }
+    .bubble.ai{
+      align-self:flex-end;
+    }
+
+    .composer{
+      position: sticky;
+      bottom: 0;
+      margin-top: 14px;
+      background: rgba(12,11,16,0.88);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 14px;
+      padding: 10px;
+    }
+    .composer-row{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      direction:ltr; /* حتى زر الإرسال يبقى يسار مثل تصميمك */
+    }
+    .chat-input{
+      flex:1;
+      padding:12px 12px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,0.12);
+      background:#101019;
+      color:#fff;
+      outline:none;
+      direction: rtl; /* الكتابة عربي */
+      text-align: right;
+    }
+    .send-btn{
+      width:52px;
+      height:44px;
+      border-radius:12px;
+      border:none;
+      background: var(--run-grad);
+      color:#05060b;
+      font-size:18px;
+      font-weight:900;
+      cursor:pointer;
+      flex:0 0 auto;
+    }
+    .send-btn:disabled{opacity:.6}
+
+    /* ===== Bottom nav (COPIED from mine.html) ===== */
+    .bottom-nav {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 78px;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding: 8px 0 30px 0;
+      background-color: var(--bottom-bg);
+      box-shadow: 0 -1px 0 rgba(255, 255, 255, 0.04);
+    }
+
+    .bottom-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .bottom-icon-img {
+      width: 26px;
+      height: 26px;
+      object-fit: contain;
+    }
+
+    .bottom-item.power .bottom-icon-img.power-img {
+      width: 40px;
+      height: 40px;
+      border-radius: 999px;
+    }
+
+    .bottom-item.active span {
+      color: var(--bottom-active);
+    }
+
+    @media (min-width: 480px) {
+      .page { max-width: 480px; margin: 0 auto; }
+      .bottom-nav {
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
+        max-width: 480px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+<header class="nav-bar"><div>Jopai</div></header>
+<main class="content">
+<section class="chat">
+<div class="chat-log" id="chatLog">
+<div class="bubble ai">أهلاً 🤍 أنا Jopai. اكتبي سؤالك تحت.</div>
+</div>
+<div class="composer">
+<div class="composer-row">
+<button class="send-btn" id="sendBtn" type="button">➤</button>
+<input class="chat-input" id="chatInput" placeholder="اكتب سؤالك هنا..." type="text"/>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom nav: نفس ترتيب mine.html حرفيًا -->
+<nav class="bottom-nav">
+<div class="bottom-item tools">
+<img alt="AI-Tools" class="bottom-icon-img" src="images/tools-icon.png"/>
+<span data-i18n="nav.ai_tools">AI–Tools</span>
+</div>
+<div class="bottom-item chat active">
+<img alt="AI Chat" class="bottom-icon-img" src="images/chat-icon.png"/>
+<span data-i18n="nav.ai_chat">AI Chat</span>
+</div>
+<div class="bottom-item power">
+<img alt="AI Power" class="bottom-icon-img power-img" src="images/ai-power.gif"/>
+<span data-i18n="nav.ai_power">AI Power</span>
+</div>
+<div class="bottom-item assets">
+<img alt="Assets" class="bottom-icon-img" src="images/assets-icon.png"/>
+<span data-i18n="nav.assets">Assets</span>
+</div>
+<div class="bottom-item mine">
+<img alt="Mine" class="bottom-icon-img" src="images/mine-icon.png"/>
+<span data-i18n="nav.mine">Mine</span>
+</div>
+</nav>
+</div>
+<script>
+(function(){
+  // bottom nav clicks (copied behavior)
+  var bottomTools = document.querySelector('.bottom-nav .bottom-item.tools');
+  if (bottomTools) bottomTools.addEventListener('click', function(){ window.location.href='ai-tools.html'; });
+
+  var bottomChat = document.querySelector('.bottom-nav .bottom-item.chat');
+  if (bottomChat) bottomChat.addEventListener('click', function(){ window.location.href='ai-chat.html'; });
+
+  var bottomPower = document.querySelector('.bottom-nav .bottom-item.power');
+  if (bottomPower) bottomPower.addEventListener('click', function(){ window.location.href='ai-power.html'; });
+
+  var bottomAssets = document.querySelector('.bottom-nav .bottom-item.assets');
+  if (bottomAssets) bottomAssets.addEventListener('click', function(){ window.location.href='my-assets.html'; });
+
+  var bottomMine = document.querySelector('.bottom-nav .bottom-item.mine');
+  if (bottomMine) bottomMine.addEventListener('click', function(){ window.location.href='mine.html'; });
+
+  // Bridge: Run from tools sends ?q=
+  try{
+    var params = new URLSearchParams(location.search);
+    var q = params.get('q');
+    if (q) document.getElementById('chatInput').value = q;
+  }catch(e){}
+
+})();
+</script>
+<!-- your existing scripts -->
+<script src="sb-config.js"></script>
+<script src="auth.js"></script>
+<script src="sb-user.js"></script>
+<script src="jopai.js"></script>
+<script defer src="i18n-site.js"></script></body>
+</html>

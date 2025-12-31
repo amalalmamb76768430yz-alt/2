@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
+<title>Task Center</title>
+<style>
+:root{
+  --bg0:#000000;
+  --bg1:#000000;
+  --stroke:rgba(255,255,255,.08);
+  --text:rgba(255,255,255,.92);
+  --muted:rgba(255,255,255,.65);
+  --accentA:#29b6ff;
+  --accentB:#2de5c5;
+  --shadow:0 18px 45px rgba(0,0,0,.55);
+  --r:20px;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  background:#000000;
+  color:var(--text);
+  display:flex;
+  justify-content:center;
+  padding:14px;
+}
+.phone{
+  width:min(420px,100%);
+  border-radius:28px;
+  border:1px solid var(--stroke);
+  overflow:hidden;
+  box-shadow:var(--shadow);
+  background:rgba(0,0,0,.35);
+}
+
+/* Top bar */
+.top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:14px;
+}
+.icon{
+  width:40px;height:40px;
+  border-radius:14px;
+  border:1px solid var(--stroke);
+  display:grid;place-items:center;
+  background:rgba(255,255,255,.05);
+  cursor:pointer;
+  user-select:none;
+  -webkit-tap-highlight-color:transparent;
+}
+.icon:active{transform:scale(.98)}
+.title{font-weight:800}
+
+/* Banner */
+.banner{
+  height:150px;
+  margin:0 12px 14px;
+  border-radius:18px;
+  background:
+    linear-gradient(180deg, rgba(0,0,0,.25), rgba(0,0,0,.55)),
+    url("images/taskcenteer.png") center / cover no-repeat;
+  border:1px solid var(--stroke);
+}
+
+/* Card */
+.card{
+  margin:0 16px;
+  border:1px solid var(--stroke);
+  border-radius:var(--r);
+  padding:14px;
+  background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.big{font-size:18px;font-weight:900}
+.muted{font-size:12px;color:var(--muted)}
+
+.claim{
+  margin-top:12px;
+  width:100%;
+  height:44px;
+  border:none;
+  border-radius:999px;
+  font-weight:900;
+  color:#041510;
+  background:linear-gradient(90deg,var(--accentA),var(--accentB));
+}
+.claim:disabled{opacity:.55;cursor:not-allowed;filter:saturate(.7)}
+
+/* Tabs */
+.tabs{
+  display:flex;
+  gap:6px;
+  margin:14px 16px 6px;
+  padding:4px;
+  background:rgba(255,255,255,.06);
+  border-radius:999px;
+}
+.tab{
+  flex:1;
+  text-align:center;
+  padding:8px 0;
+  font-size:13px;
+  color:var(--muted);
+  border-radius:999px;
+}
+.tab.active{
+  background:rgba(255,255,255,.14);
+  color:var(--text);
+  font-weight:800;
+}
+
+/* Sub tabs */
+.subtabs{
+  display:flex;
+  gap:18px;
+  padding:10px 16px 0;
+}
+.subtab{
+  color:var(--muted);
+  position:relative;
+  padding-bottom:6px;
+}
+.subtab.active{
+  color:var(--text);
+  font-weight:800;
+}
+.subtab.active::after{
+  content:'';
+  position:absolute;
+  left:0;right:0;bottom:0;
+  height:2px;
+  background:linear-gradient(90deg,var(--accentA),var(--accentB));
+}
+
+/* List */
+.listwrap{
+  padding:14px 16px 24px;
+}
+#list .item{
+  border-bottom:1px solid rgba(255,255,255,.08);
+  padding:12px 0;
+}
+#list .item:last-child{border-bottom:none}
+#list .main{display:flex;justify-content:space-between}
+#list .sub{font-size:12px;color:var(--muted);margin-top:4px}
+.empty{
+  text-align:center;
+  color:var(--muted);
+  padding:28px 0;
+}
+
+/* Toast */
+.toast{
+  position:fixed;
+  left:50%;
+  bottom:18px;
+  transform:translateX(-50%);
+  background:rgba(10,16,24,.95);
+  border:1px solid rgba(255,255,255,.12);
+  padding:10px 14px;
+  border-radius:16px;
+  display:none;
+  max-width:min(420px,92vw);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.toast.show{display:block}
+
+
+/* Hide top-right refresh button (keep element for JS safety) */
+#reloadBtn{display:none !important;}
+</style>
+</head>
+<body>
+<div class="phone">
+<div class="top">
+<div aria-label="Back" class="icon" id="backBtn">‹</div>
+<div class="title">Task Center</div>
+<div aria-label="Reload" class="icon" id="reloadBtn">⟳</div>
+</div>
+<div aria-hidden="true" class="banner"></div>
+<div class="card">
+<div class="row">
+<div>
+<div class="muted">Waiting to claim</div>
+<div class="big" id="availableAmount">0.00 USDT</div>
+<div class="muted" id="availableCount">0 available rewards</div>
+</div>
+<div class="muted" id="loginState">Logged out</div>
+</div>
+<button class="claim" disabled="" id="claimBtn">One-click claim</button>
+<div class="muted" style="margin-top:10px">
+      Rewards are not credited automatically. You must press "Claim".
+    </div>
+</div>
+<div aria-label="Task type tabs" class="tabs">
+<div class="tab active">Limited time</div>
+<div class="tab">Daily</div>
+<div class="tab">Long-term</div>
+</div>
+<div aria-label="Status tabs" class="subtabs">
+<div class="subtab active">In progress</div>
+<div class="subtab">Completed</div>
+<div class="subtab">Not completed</div>
+</div>
+<div class="listwrap">
+<div class="empty" data-i18n="common.loading" id="statusBox">Loading...</div>
+<div id="list"></div>
+</div>
+</div>
+<div class="toast" id="toast"></div>
+<!-- Keep your real site binding -->
+<script>
+(function(){
+  function setActive(nodes, idx){
+    nodes.forEach(function(n,i){ n.classList.toggle('active', i===idx); });
+  }
+  function toast(msg){
+    var t=document.getElementById('toast');
+    if(!t) return;
+    t.textContent = msg;
+    t.classList.add('show');
+    window.clearTimeout(toast._tm);
+    toast._tm=setTimeout(function(){ t.classList.remove('show'); }, 1800);
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    var back=document.getElementById('backBtn');
+    if(back){
+      back.addEventListener('click', function(){
+        // Prefer normal back, but avoid returning to my-assets.html if that is the referrer
+        var ref = (document.referrer || '').toLowerCase();
+        if (window.history.length > 1 && ref.indexOf('my-assets.html') === -1) {
+          window.history.back();
+          return;
+        }
+        // Fallback destination (change if your site uses a different main page)
+        window.location.href = 'member.html';
+      });
+    }
+
+    var tabs=[].slice.call(document.querySelectorAll('.tabs .tab'));
+    var subtabs=[].slice.call(document.querySelectorAll('.subtabs .subtab'));
+    var list=document.getElementById('list');
+
+    function applyFilter(){
+      var typeEl=document.querySelector('.tabs .tab.active');
+      var statusEl=document.querySelector('.subtabs .subtab.active');
+      var type = typeEl ? typeEl.textContent.trim() : '';
+      var status = statusEl ? statusEl.textContent.trim() : '';
+
+      // Notify any existing logic (if task-center.js wants to listen)
+      window.dispatchEvent(new CustomEvent('taskcenter:filterchange', {detail:{type:type, status:status}}));
+
+      // Best-effort DOM filtering (works if items have dataset.status/type or contain keywords)
+      if(!list) return;
+      var items=[].slice.call(list.children);
+      if(!items.length) return;
+
+      var wantStatus=status.toLowerCase();
+      items.forEach(function(item){
+        var itStatus = (item.dataset && (item.dataset.status || item.dataset.state) || '').toLowerCase();
+        var itType = (item.dataset && item.dataset.type || '').toLowerCase();
+        var text = (item.textContent || '').toLowerCase();
+
+        var okStatus = true;
+        if (wantStatus.includes('progress')) okStatus = itStatus.includes('progress') || text.includes('in progress') || text.includes('pending') || itStatus==='';
+        if (wantStatus.includes('completed')) okStatus = itStatus.includes('completed') || text.includes('completed');
+        if (wantStatus.includes('not completed')) okStatus = itStatus.includes('not') || text.includes('not completed') || text.includes('failed');
+
+        var okType = true;
+        var wantType = type.toLowerCase();
+        if (wantType.includes('limited')) okType = itType.includes('limited') || itType==='' || text.includes('limited');
+        if (wantType.includes('daily')) okType = itType.includes('daily') || text.includes('daily');
+        if (wantType.includes('long')) okType = itType.includes('long') || text.includes('long');
+
+        item.style.display = (okStatus && okType) ? '' : 'none';
+      });
+    }
+
+    tabs.forEach(function(tab, i){
+      tab.style.cursor='pointer';
+      tab.addEventListener('click', function(){
+        setActive(tabs, i);
+        applyFilter();
+      });
+    });
+
+    subtabs.forEach(function(tab, i){
+      tab.style.cursor='pointer';
+      tab.addEventListener('click', function(){
+        setActive(subtabs, i);
+        applyFilter();
+      });
+    });
+
+    // Initialize filtering once
+    applyFilter();
+  });
+})();
+</script><script src="sb-config.js"></script>
+<script src="auth.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="task-center.js"></script>
+<script defer src="i18n-site.js"></script></body>
+</html>
