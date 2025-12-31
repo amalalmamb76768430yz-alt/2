@@ -70,7 +70,30 @@
     return Array.isArray(data) ? data : [];
   }
 
-  async function markRead(uid, messageId) {
+  
+  async function markAllRead(uid) {
+    if (!uid) return false;
+    var url =
+      SB.url +
+      '/rest/v1/user_messages?user_id=eq.' + encodeURIComponent(uid) +
+      '&is_read=eq.false';
+
+    var headers = SB.headers();
+    headers.Prefer = 'return=minimal';
+
+    try {
+      var res = await fetch(url, {
+        method: 'PATCH',
+        headers: headers,
+        body: JSON.stringify({ is_read: true })
+      });
+      return !!(res && res.ok);
+    } catch (e) {
+      return false;
+    }
+  }
+
+async function markRead(uid, messageId) {
     try {
       await rpc('mark_user_message_read', { p_user: uid, p_message_id: messageId });
       return true;
@@ -169,6 +192,28 @@
       var rows = await fetchMessages(uid, 50);
       if (statusEl) statusEl.textContent = '';
       render(rows);
+      // Cache unread indicator for Mine badge
+      try {
+        var unreadCount = 0;
+        for (var i = 0; i < rows.length; i++) unreadCount += rows[i] && rows[i].is_read ? 0 : 1;
+        localStorage.setItem('site_msg_unread', unreadCount > 0 ? '1' : '0');
+        localStorage.setItem('site_msg_unread_count', String(unreadCount));
+      } catch (e) {}
+
+      // Optional: once user opens the page, mark all unread as read
+      if (rows && rows.length) {
+        var hasUnread = false;
+        for (var j = 0; j < rows.length; j++) { if (rows[j] && !rows[j].is_read) { hasUnread = true; break; } }
+        if (hasUnread) {
+          markAllRead(uid).then(function () {
+            try {
+              localStorage.setItem('site_msg_unread', '0');
+              localStorage.setItem('site_msg_unread_count', '0');
+            } catch (e) {}
+          }).catch(function () {});
+        }
+      }
+
     } catch (e) {
       console.error(e);
       if (statusEl) statusEl.textContent = 'Failed to load';
