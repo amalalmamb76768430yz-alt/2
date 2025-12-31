@@ -18,7 +18,7 @@
   }
 
   function getLang(){
-    return normalizeLang(localStorage.getItem(STORAGE_KEY) || (navigator.language||'en'));
+    return normalizeLang(localStorage.getItem(STORAGE_KEY) || 'en');
   }
 
   function setLang(lang){
@@ -37,8 +37,8 @@
   function applyDir(lang){
     var html = document.documentElement;
     html.setAttribute('lang', lang);
-    var isRTL = !!RTL_LANGS[lang];
-    html.setAttribute('dir', isRTL ? 'rtl' : 'ltr');
+    html.setAttribute('dir', 'ltr');
+    // Keep layout direction LTR even for Arabic; only text changes.
   }
 
   function apply(lang){

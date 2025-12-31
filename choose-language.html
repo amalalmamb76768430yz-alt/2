@@ -365,7 +365,7 @@
 
       function applyDir(lang){
         const rtl = (lang === "ar");
-        document.documentElement.setAttribute("dir", rtl ? "rtl" : "ltr");
+        document.documentElement.setAttribute("dir", "ltr");
         document.documentElement.setAttribute("lang", lang === "zh-Hant" ? "zh-Hant" : lang);
       }
 
@@ -403,14 +403,14 @@
       // Expose a tiny helper for the rest of the site (optional)
       window.EXARAI_I18N = window.EXARAI_I18N || {};
       window.EXARAI_I18N.getLang = function(){
-        return normalizeLang(localStorage.getItem(STORAGE_KEY) || navigator.language || "en");
+        return normalizeLang(localStorage.getItem(STORAGE_KEY) || "en");
       };
       window.EXARAI_I18N.setLang = function(lang){
         setLanguage(lang);
       };
 
       // Init
-      const initial = normalizeLang(localStorage.getItem(STORAGE_KEY) || navigator.language || "en");
+      const initial = normalizeLang(localStorage.getItem(STORAGE_KEY) || "en");
       setLanguage(initial);
 
       // Click handlers
